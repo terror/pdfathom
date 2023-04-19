@@ -10,6 +10,7 @@ from typing import Dict
 from urllib.request import urlretrieve
 
 from langchain.chains import RetrievalQA
+from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.llms import OpenAI
@@ -39,33 +40,27 @@ class Config:
 class Loader:
   openai_api_key: str
 
-  def load(self, pdf_paths) -> Dict[str, RetrievalQA]:
+  def load(self, pdf_paths: t.List[str]) -> Dict[str, BaseRetrievalQA]:
     """Load PDFs from paths or URLs and return a dictionary of RetrievalQA objects."""
-    pdfs = {}
-    for pdf_path in pdf_paths:
-      if pdf_path.startswith("http") or pdf_path.startswith("https"):
-        try:
-          temp_path = self._download_pdf(pdf_path)
-          pdfs[pdf_path] = self._build_retriever(temp_path)
-        except Exception as e:
-          print(f"Error downloading or loading PDF from {pdf_path}: {e}")
-      else:
-        try:
-          pdfs[pdf_path] = self._build_retriever(pdf_path)
-        except Exception as e:
-          print(f"Error loading PDF from {pdf_path}: {e}")
-    return pdfs
+    return {
+      pdf_path: self._build_retriever(self._pdf_path(pdf_path))
+      for pdf_path in pdf_paths
+    }
+
+  def _pdf_path(self, path: str) -> str:
+    return self._download_pdf(
+      path
+    ) if path.startswith("http") or path.startswith("https") else path
 
   def _download_pdf(self, url: str) -> str:
     """Download PDF from URL and save it to a temporary file."""
-    temp_path = os.path.join(
-      os.path.expanduser("~/.pdfathom_cache"), os.path.basename(url)
-    )
+    cache = os.path.expanduser("~/.pdfathom_cache")
+    temp_path = os.path.join(cache, os.path.basename(url))
     os.makedirs(os.path.dirname(temp_path), exist_ok=True)
     urlretrieve(url, temp_path)
     return temp_path
 
-  def _build_retriever(self, path: str):
+  def _build_retriever(self, path: str) -> BaseRetrievalQA:
     return RetrievalQA.from_chain_type(
       llm=OpenAI(client=None, openai_api_key=self.openai_api_key),
       chain_type="stuff",
@@ -81,7 +76,9 @@ class Loader:
 
 @dataclass
 class Repl:
-  retrievers: Dict[str, RetrievalQA]
+  def __init__(self, retrievers: Dict[str, BaseRetrievalQA]):
+    self.retrievers = retrievers
+    self.active = list(retrievers.keys())[0]
 
   def run(self):
     histfile = os.path.expanduser("~/.pdfathom_history")
@@ -94,9 +91,7 @@ class Repl:
     atexit.register(readline.write_history_file, histfile)
     readline.parse_and_bind("tab: complete")
 
-    active_pdf = list(self.retrievers.keys())[0]
-
-    print(f"Active PDF: {active_pdf}")
+    print(f"Active PDF: {self.active}")
     print("Enter a query to search the PDF, or type 'exit' to quit.")
     print("Use the up and down arrow keys to navigate through command history.")
     print("Press 'Tab' for command completion suggestions.")
@@ -111,12 +106,12 @@ class Repl:
         elif query.lower().startswith("switch"):
           _, pdf_name = query.split(" ", 1)
           if pdf_name in self.retrievers:
-            active_pdf = pdf_name
-            print(f"Switched to PDF: {active_pdf}")
+            self.active = pdf_name
+            print(f"Switched to PDF: {self.active}")
           else:
             print(f"PDF not found: {pdf_name}")
         else:
-          print(self.retrievers[active_pdf]({"query": query})["result"])
+          print(self.retrievers[self.active]({"query": query})["result"])
       except KeyboardInterrupt:
         break
       except Exception as error:
