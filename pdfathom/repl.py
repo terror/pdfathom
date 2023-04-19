@@ -30,8 +30,8 @@ class Repl:
   def __init__(self, loader: Loader):
     self.loader = loader
 
-  def run(self):
-    """Start the REPL.""" ""
+  def run(self) -> None:
+    """Start the REPL."""
 
     self._init_readline()
 
@@ -51,9 +51,11 @@ class Repl:
         elif query.lower() == "clear":
           self._clear()
         elif query.lower().startswith("switch"):
-          self._switch(query.split(" ", 1)[0])
+          _, pdf = query.split(" ", 1)
+          self._switch(pdf)
         elif query.lower().startswith("load"):
-          self._load(query.split(" ", 1)[0])
+          _, pdf = query.split(" ", 1)
+          self._load(pdf)
         else:
           if (retriever := self.loader.get_active_retriever()):
             print(
@@ -67,8 +69,8 @@ class Repl:
       except Exception as error:
         print(f'error: {error}')
 
-  def _init_readline(self):
-    """Initialize readline for command history and completion.""" ""
+  def _init_readline(self) -> None:
+    """Initialize readline for command history and completion."""
 
     histfile = os.path.expanduser("~/.pdfathom_history")
 
@@ -80,12 +82,12 @@ class Repl:
     atexit.register(readline.write_history_file, histfile)
     readline.parse_and_bind("tab: complete")
 
-  def _clear(self):
+  def _clear(self) -> None:
     """Clear the terminal."""
 
     os.system("cls" if os.name == "nt" else "clear")
 
-  def _switch(self, pdf):
+  def _switch(self, pdf: str) -> None:
     """Switch to a PDF from a path or URL."""
 
     if self.loader.has_document(pdf):
@@ -97,8 +99,8 @@ class Repl:
       ).lower() == "y":
         self._load(pdf)
 
-  def _load(self, pdf):
-    """Load a PDF from a path or URL.""" ""
+  def _load(self, pdf: str) -> None:
+    """Load a PDF from a path or URL."""
 
     if self.loader.has_document(pdf):
       print(f"{pdf} is already loaded in this context")
@@ -106,7 +108,7 @@ class Repl:
       self.loader.load_document(pdf)
       print(f"Successfully loaded {pdf}")
 
-  def _list(self):
+  def _list(self) -> None:
     """List all loaded PDFs."""
 
     print(f"Loaded documents: {self.loader.documents()}")

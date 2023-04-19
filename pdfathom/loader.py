@@ -17,7 +17,7 @@ class Loader:
     self.active = None
 
   def initialize(self, pdf_paths: List[str]):
-    """Initialize the loader with a list of PDFs.""" ""
+    """Initialize the loader with a list of PDFs."""
 
     self.load_documents(pdf_paths)
 
@@ -27,7 +27,7 @@ class Loader:
     return self
 
   def documents(self) -> List[str]:
-    """Get a list of PDFs.""" ""
+    """Get a list of PDFs."""
 
     return list(self.retrievers.keys())
 
@@ -41,22 +41,22 @@ class Loader:
 
     return None if not self.active else self.retrievers[self.active]
 
-  def set_active_document(self, pdf_path: str):
+  def set_active_document(self, pdf_path: str) -> None:
     """Set the active PDF."""
 
     self.active = pdf_path
 
   def has_document(self, pdf_path: str) -> bool:
-    """Check if a PDF has been loaded.""" ""
+    """Check if a PDF has been loaded."""
 
     return pdf_path in self.retrievers
 
-  def load_document(self, pdf_path: str):
+  def load_document(self, pdf_path: str) -> None:
     """Load a PDF from a path or URL.""" ""
 
     self.retrievers[pdf_path] = self._build_retriever(self._pdf_path(pdf_path))
 
-  def load_documents(self, pdf_paths: List[str]):
+  def load_documents(self, pdf_paths: List[str]) -> None:
     """Load multiple PDFs from paths or URLs."""
 
     for pdf_path in pdf_paths:
@@ -79,7 +79,7 @@ class Loader:
     return temp_path
 
   def _build_retriever(self, path: str) -> BaseRetrievalQA:
-    """Build a retriever for a PDF.""" ""
+    """Build a retriever for a PDF."""
 
     return RetrievalQA.from_chain_type(
       llm=OpenAI(client=None, openai_api_key=self.openai_api_key),
