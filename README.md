@@ -9,7 +9,7 @@ You can install it via the pip package manager:
 $ pip install pdfathom
 ```
 
-### Usage & Configuration
+### Usage
 
 Below is the output of `pdfathom --help`:
 
@@ -25,5 +25,15 @@ options:
   --openai_api_key OPENAI_API_KEY, -k OPENAI_API_KEY OpenAI API key
 ```
 
+### Configuration
+
+**pdfathom** looks for a configuration file called `.pdfathom.json` located in
+your home directory, and it looks like:
+
+```
+{"openai_api_key": "<OPENAI-API-KEY>"}
+```
+
 You will be prompted for an OpenAI API key upon running the program if it's not
-already present in `~/.pdfathom.json`.
+already present in the configuration file, this will also handle creating the
+configuration file for you.
