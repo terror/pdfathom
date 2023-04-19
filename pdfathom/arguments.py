@@ -14,6 +14,8 @@ class Arguments:
 
   @staticmethod
   def from_args():
+    """Parse the command line arguments."""
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -42,9 +44,11 @@ class Arguments:
     return Arguments(**vars(parser.parse_args()))
 
   def run(self):
+    """Run the REPL."""
+
     config = Config.load(self.config)
 
     if self.openai_api_key:
       config.openai_api_key = self.openai_api_key
 
-    Repl(Loader(config.openai_api_key).load(self.pdfs)).run()
+    Repl(Loader(config.openai_api_key).initialize(self.pdfs)).run()
