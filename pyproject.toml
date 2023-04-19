@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "pdfathom"
+version = "0.1.0"
+description = "Query PDFs in natural language from the command-line"
+authors = ["Liam <liam@scalzulli.com>"]
+license = "CC0-1.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+chromadb = "^0.3.21"
+langchain = "^0.0.144"
+openai = "^0.27.4"
+pypdf = "^3.8.0"
+python = "^3.10"
+tiktoken = "^0.3.3"
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.12.0"
+toml = "^0.10.2"
+yapf = "^0.33.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
