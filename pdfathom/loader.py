@@ -26,6 +26,11 @@ class Loader:
 
     return self
 
+  def documents(self) -> List[str]:
+    """Get a list of PDFs.""" ""
+
+    return list(self.retrievers.keys())
+
   def get_active_document(self) -> str | None:
     """Get the active PDF."""
 

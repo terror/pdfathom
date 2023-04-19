@@ -44,6 +44,10 @@ class Repl:
         query = input("> ")
         if query.lower() == "exit":
           break
+        elif query.lower() == 'help':
+          print(Repl.HELP)
+        elif query.lower() == "list":
+          self._list()
         elif query.lower() == "clear":
           self._clear()
         elif query.lower().startswith("switch"):
@@ -101,3 +105,8 @@ class Repl:
     else:
       self.loader.load_document(pdf)
       print(f"Successfully loaded {pdf}")
+
+  def _list(self):
+    """List all loaded PDFs."""
+
+    print(f"Loaded documents: {self.loader.documents()}")
