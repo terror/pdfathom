@@ -3,11 +3,9 @@ import logging
 from dataclasses import dataclass
 from typing import List
 
-from config import Config
-from db import Db
-from repl import Repl
-
-from pdfathom.db import DbConfig
+from .config import Config
+from .db import Db, DbConfig
+from .repl import Repl
 
 @dataclass
 class Arguments:

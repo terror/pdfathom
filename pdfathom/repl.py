@@ -4,9 +4,10 @@ import readline
 from dataclasses import dataclass
 from textwrap import dedent
 
-from db import Db
 from rich import print
 from rich.prompt import Confirm
+
+from .db import Db
 
 @dataclass
 class Repl:
