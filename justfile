@@ -10,6 +10,9 @@ default:
 
 all: forbid fmt-check lint
 
+build:
+  poetry build
+
 dev-deps:
   brew install ruff
   cargo install present
@@ -27,6 +30,9 @@ fmt-check:
 
 lint:
   ruff check .
+
+publish:
+  poetry publish
 
 readme:
   present --in-place README.md
