@@ -6,6 +6,7 @@ from textwrap import dedent
 
 from db import Db
 from rich import print
+from rich.prompt import Confirm
 
 @dataclass
 class Repl:
@@ -15,16 +16,18 @@ class Repl:
 
     [bold]Available commands:[/bold]
 
-    - [green]exit[/green]: Exits the application.
+    - [green]active[/green]: Prints the active PDF document.
     - [green]clear[/green]: Clears the terminal screen.
-    - [green]switch [path or URL][/green]: Switches to another PDF document from a specified path or URL.
-    - [green]load [path or URL][/green]: Loads a new PDF document from a specified path or URL.
+    - [green]exit[/green]: Exits the application.
+    - [green]help[/green]: Displays the help text with available commands.
+    - [green]list[/green]: Lists all loaded PDF documents.
+    - [green]load <path or url>[/green]: Loads a new PDF document from a specified path or URL.
+    - [green]switch <path or url>[/green]: Switches to another PDF document from a specified path or URL.
 
     [bold]Additional features:[/bold]
 
     - Use the up and down arrow keys to navigate through command history.
-    - Press 'Tab' for command completion suggestions.
-    '''
+    - Press 'Tab' for command completion suggestions.'''
   )
 
   def __init__(self, db: Db):
@@ -41,10 +44,14 @@ class Repl:
 
     while True:
       try:
-        query = input("> ")
+        query = input("\n> ")
 
         if query.lower() == "exit":
           break
+        elif query.lower() == "active":
+          self._print(
+            f'Active document: [bold]{self.db.get_active_document()}[/bold]'
+          )
         elif query.lower() == 'help':
           print(Repl.HELP)
         elif query.lower() == "list":
@@ -59,16 +66,13 @@ class Repl:
           self._load(pdf)
         else:
           if (retriever := self.db.get_active_retriever()):
-            print(
-              '\n' + dedent(retriever({"query": query})["result"].strip()) +
-              '\n'
-            )
+            self._print(dedent(retriever({"query": query})["result"].strip()))
           else:
-            print('No active document to query')
+            self._print('No active document to query')
       except KeyboardInterrupt:
         break
       except Exception as error:
-        print(f'error: {error}')
+        self._print(f'[bold][red]error[/red]:[/bold] {error}')
 
   def _init_readline(self) -> None:
     """Initialize readline for command history and completion."""
@@ -83,6 +87,11 @@ class Repl:
     atexit.register(readline.write_history_file, histfile)
     readline.parse_and_bind("tab: complete")
 
+  def _print(self, message: str) -> None:
+    """Print a message to the terminal.""" ""
+
+    print('\n' + message)
+
   def _clear(self) -> None:
     """Clear the terminal."""
 
@@ -93,23 +102,26 @@ class Repl:
 
     if self.db.has_document(pdf):
       self.db.set_active_document(pdf)
-      print(f"Successfully switched to {pdf}")
+      self._print(f"[bold][green]Successfully switched to {pdf}[/green][/bold]")
     else:
-      if input(
-          f"{pdf} does not exist in this context, would you like to load it? [Y/N]: "
-      ).lower() == "y":
+      if Confirm.ask(
+          f"\n[bold]{pdf}[/bold] does not exist in this context, would you like to load it?",
+      ):
         self._load(pdf)
 
   def _load(self, pdf: str) -> None:
     """Load a PDF from a path or URL."""
 
     if self.db.has_document(pdf):
-      print(f"{pdf} is already loaded in this context")
+      if Confirm.ask(
+          f"\n[bold]{pdf}[/bold] is already loaded in this context, would you like to switch to it?",
+      ):
+        self._switch(pdf)
     else:
       self.db.load_document(pdf)
-      print(f"Successfully loaded {pdf}")
+      self._print(f"[bold][green]Successfully loaded {pdf}[/green][bold]")
 
   def _list(self) -> None:
     """List all loaded PDFs."""
 
-    print(f"Loaded documents: {self.db.documents()}")
+    self._print(f"Loaded documents: {self.db.documents()}")

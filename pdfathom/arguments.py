@@ -1,4 +1,5 @@
 import argparse
+import logging
 from dataclasses import dataclass
 from typing import List
 
@@ -67,6 +68,9 @@ class Arguments:
 
   def run(self):
     """Run the REPL."""
+
+    chromadb_logger = logging.getLogger("chromadb")
+    chromadb_logger.setLevel(logging.ERROR)
 
     config = Config.load(self.config)
 

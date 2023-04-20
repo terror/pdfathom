@@ -92,7 +92,6 @@ class Db:
 
     return RetrievalQA.from_chain_type(
       llm=OpenAI(client=self.client, openai_api_key=self.config.openai_api_key),
-      chain_type="stuff",
       retriever=Chroma.from_documents(
         CharacterTextSplitter(
           chunk_size=self.config.chunk_size,
@@ -101,7 +100,6 @@ class Db:
         OpenAIEmbeddings(
           client=self.client, openai_api_key=self.config.openai_api_key
         ),
-        persist_directory=os.path.expanduser("~/.pdfathom.db"),
       ).as_retriever(),
       return_source_documents=True,
     )
