@@ -4,7 +4,7 @@ import readline
 from dataclasses import dataclass
 from textwrap import dedent
 
-from loader import Loader
+from db import Db
 from rich import print
 
 @dataclass
@@ -27,21 +27,22 @@ class Repl:
     '''
   )
 
-  def __init__(self, loader: Loader):
-    self.loader = loader
+  def __init__(self, db: Db):
+    self.db = db
 
   def run(self) -> None:
     """Start the REPL."""
 
     self._init_readline()
 
-    print(f'Active document: [bold]{self.loader.get_active_document()}[/bold]')
+    print(f'Active document: [bold]{self.db.get_active_document()}[/bold]')
 
     print(Repl.HELP)
 
     while True:
       try:
         query = input("> ")
+
         if query.lower() == "exit":
           break
         elif query.lower() == 'help':
@@ -50,14 +51,14 @@ class Repl:
           self._list()
         elif query.lower() == "clear":
           self._clear()
-        elif query.lower().startswith("switch"):
+        elif query.lower().startswith("switch") and len(query.split()) == 2:
           _, pdf = query.split(" ", 1)
           self._switch(pdf)
-        elif query.lower().startswith("load"):
+        elif query.lower().startswith("load") and len(query.split()) == 2:
           _, pdf = query.split(" ", 1)
           self._load(pdf)
         else:
-          if (retriever := self.loader.get_active_retriever()):
+          if (retriever := self.db.get_active_retriever()):
             print(
               '\n' + dedent(retriever({"query": query})["result"].strip()) +
               '\n'
@@ -90,8 +91,8 @@ class Repl:
   def _switch(self, pdf: str) -> None:
     """Switch to a PDF from a path or URL."""
 
-    if self.loader.has_document(pdf):
-      self.loader.set_active_document(pdf)
+    if self.db.has_document(pdf):
+      self.db.set_active_document(pdf)
       print(f"Successfully switched to {pdf}")
     else:
       if input(
@@ -102,13 +103,13 @@ class Repl:
   def _load(self, pdf: str) -> None:
     """Load a PDF from a path or URL."""
 
-    if self.loader.has_document(pdf):
+    if self.db.has_document(pdf):
       print(f"{pdf} is already loaded in this context")
     else:
-      self.loader.load_document(pdf)
+      self.db.load_document(pdf)
       print(f"Successfully loaded {pdf}")
 
   def _list(self) -> None:
     """List all loaded PDFs."""
 
-    print(f"Loaded documents: {self.loader.documents()}")
+    print(f"Loaded documents: {self.db.documents()}")

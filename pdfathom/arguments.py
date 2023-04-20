@@ -3,14 +3,18 @@ from dataclasses import dataclass
 from typing import List
 
 from config import Config
-from loader import Loader
+from db import Db
 from repl import Repl
+
+from pdfathom.db import DbConfig
 
 @dataclass
 class Arguments:
   pdfs: List[str]
   config: str
   openai_api_key: str
+  chunk_size: int
+  chunk_overlap: int
 
   @staticmethod
   def from_args():
@@ -41,6 +45,24 @@ class Arguments:
       help="OpenAI API key",
     )
 
+    parser.add_argument(
+      "--chunk_size",
+      "-s",
+      type=int,
+      required=False,
+      default=1000,
+      help="Chunk size",
+    )
+
+    parser.add_argument(
+      "--chunk_overlap",
+      "-o",
+      type=int,
+      required=False,
+      default=0,
+      help="Chunk overlap",
+    )
+
     return Arguments(**vars(parser.parse_args()))
 
   def run(self):
@@ -51,4 +73,8 @@ class Arguments:
     if self.openai_api_key:
       config.openai_api_key = self.openai_api_key
 
-    Repl(Loader(config.openai_api_key).initialize(self.pdfs)).run()
+    db_config = DbConfig(
+      config.openai_api_key, self.chunk_size, self.chunk_overlap
+    )
+
+    Repl(Db(db_config).initialize(self.pdfs)).run()

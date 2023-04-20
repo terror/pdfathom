@@ -1,7 +1,9 @@
 import os
+from dataclasses import dataclass
 from typing import Dict, List
 from urllib.request import urlretrieve
 
+import chromadb
 from langchain.chains import RetrievalQA
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.document_loaders import PyPDFLoader
@@ -10,11 +12,18 @@ from langchain.llms import OpenAI
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 
-class Loader:
-  def __init__(self, openai_api_key: str):
-    self.openai_api_key = openai_api_key
-    self.retrievers: Dict[str, BaseRetrievalQA] = {}
+@dataclass
+class DbConfig:
+  openai_api_key: str
+  chunk_size: int
+  chunk_overlap: int
+
+class Db:
+  def __init__(self, config: DbConfig):
     self.active = None
+    self.client = chromadb.Client()
+    self.config = config
+    self.retrievers: Dict[str, BaseRetrievalQA] = {}
 
   def initialize(self, pdf_paths: List[str]):
     """Initialize the loader with a list of PDFs."""
@@ -52,9 +61,9 @@ class Loader:
     return pdf_path in self.retrievers
 
   def load_document(self, pdf_path: str) -> None:
-    """Load a PDF from a path or URL.""" ""
+    """Load a PDF from a path or URL."""
 
-    self.retrievers[pdf_path] = self._build_retriever(self._pdf_path(pdf_path))
+    self.retrievers[pdf_path] = self._store(self._pdf_path(pdf_path))
 
   def load_documents(self, pdf_paths: List[str]) -> None:
     """Load multiple PDFs from paths or URLs."""
@@ -63,7 +72,7 @@ class Loader:
       self.load_document(pdf_path)
 
   def _pdf_path(self, path: str) -> str:
-    """Return a path to a PDF.""" ""
+    """Return a path to a PDF."""
 
     return self._download_pdf(
       path
@@ -78,17 +87,20 @@ class Loader:
     urlretrieve(url, temp_path)
     return temp_path
 
-  def _build_retriever(self, path: str) -> BaseRetrievalQA:
+  def _store(self, path: str) -> BaseRetrievalQA:
     """Build a retriever for a PDF."""
 
     return RetrievalQA.from_chain_type(
-      llm=OpenAI(client=None, openai_api_key=self.openai_api_key),
+      llm=OpenAI(client=self.client, openai_api_key=self.config.openai_api_key),
       chain_type="stuff",
       retriever=Chroma.from_documents(
-        CharacterTextSplitter(chunk_size=1000, chunk_overlap=0).split_documents(
-          PyPDFLoader(path).load_and_split()
+        CharacterTextSplitter(
+          chunk_size=self.config.chunk_size,
+          chunk_overlap=self.config.chunk_overlap
+        ).split_documents(PyPDFLoader(path).load_and_split()),
+        OpenAIEmbeddings(
+          client=self.client, openai_api_key=self.config.openai_api_key
         ),
-        OpenAIEmbeddings(client=None, openai_api_key=self.openai_api_key),
         persist_directory=os.path.expanduser("~/.pdfathom.db"),
       ).as_retriever(),
       return_source_documents=True,
