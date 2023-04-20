@@ -8,7 +8,10 @@ alias r := run
 default:
   just --list
 
-all: forbid fmt-check
+all: forbid fmt-check lint
+
+dev-deps:
+  brew install ruff
 
 forbid:
   ./bin/forbid
@@ -20,6 +23,9 @@ fmt:
 fmt-check:
   isort -c . && yapf --diff --recursive .
   prettier --check .
+
+lint:
+  ruff check .
 
 run *args:
   python3 pdfathom {{args}}

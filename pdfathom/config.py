@@ -9,6 +9,7 @@ class Config:
   @staticmethod
   def load(config_path: str):
     """Load configuration data from a file or prompt the user for the API key."""
+
     path = os.path.expanduser(config_path)
 
     if not os.path.exists(path):
