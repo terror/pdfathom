@@ -9,6 +9,19 @@ You can install it via the pip package manager:
 $ pip install pdfathom
 ```
 
+### Configuration
+
+**pdfathom** looks for a configuration file called `.pdfathom.json` located in
+your home directory, and it looks like:
+
+```
+{"openai_api_key": "<OPENAI-API-KEY>"}
+```
+
+You will be prompted for an OpenAI API key upon running the program if it's not
+already present in the configuration file, this will also handle creating the
+configuration file for you.
+
 ### Usage
 
 Below is the output of `pdfathom --help`:
@@ -49,16 +62,3 @@ load and switch to different files:
 - load <path or url>: Loads a new PDF document from a specified path or URL.
 - switch <path or url>: Switches to another PDF document from a specified path or URL.
 ```
-
-### Configuration
-
-**pdfathom** looks for a configuration file called `.pdfathom.json` located in
-your home directory, and it looks like:
-
-```
-{"openai_api_key": "<OPENAI-API-KEY>"}
-```
-
-You will be prompted for an OpenAI API key upon running the program if it's not
-already present in the configuration file, this will also handle creating the
-configuration file for you.
