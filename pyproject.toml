@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pdfathom"
-version = "0.1.0"
+version = "0.1.1"
 description = "Query PDFs in natural language from the command-line"
 authors = ["Liam <liam@scalzulli.com>"]
 license = "CC0-1.0"
@@ -11,7 +11,7 @@ chromadb = "^0.3.21"
 langchain = "^0.0.144"
 openai = "^0.27.4"
 pypdf = "^3.8.0"
-python = "^3.10"
+python = "^3.8"
 rich = "^13.3.4"
 tiktoken = "^0.3.3"
 
