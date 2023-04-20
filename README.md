@@ -13,16 +13,24 @@ $ pip install pdfathom
 
 Below is the output of `pdfathom --help`:
 
-```
-usage: pdfathom [-h] [--config CONFIG] [--openai_api_key OPENAI_API_KEY] pdfs [pdfs ...]
+```present python3 pdfathom --help
+usage: pdfathom [-h] [--config CONFIG] [--openai_api_key OPENAI_API_KEY]
+                [--chunk_size CHUNK_SIZE] [--chunk_overlap CHUNK_OVERLAP]
+                pdfs [pdfs ...]
 
 positional arguments:
-  pdfs Path to the pdf file(s) or URL(s)
+  pdfs                  Path to the pdf file(s) or URL(s)
 
 options:
-  -h, --help Show this help message and exit
-  --config CONFIG, -c CONFIG Path to the configuration file
-  --openai_api_key OPENAI_API_KEY, -k OPENAI_API_KEY OpenAI API key
+  -h, --help            show this help message and exit
+  --config CONFIG, -c CONFIG
+                        Path to the configuration file
+  --openai_api_key OPENAI_API_KEY, -k OPENAI_API_KEY
+                        OpenAI API key
+  --chunk_size CHUNK_SIZE, -s CHUNK_SIZE
+                        Chunk size
+  --chunk_overlap CHUNK_OVERLAP, -o CHUNK_OVERLAP
+                        Chunk overlap
 ```
 
 ### Configuration

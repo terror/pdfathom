@@ -12,6 +12,7 @@ all: forbid fmt-check lint
 
 dev-deps:
   brew install ruff
+  cargo install present
 
 forbid:
   ./bin/forbid
@@ -26,6 +27,9 @@ fmt-check:
 
 lint:
   ruff check .
+
+readme:
+  present --in-place README.md
 
 run *args:
   python3 pdfathom {{args}}
