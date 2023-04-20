@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Union
 from urllib.request import urlretrieve
 
 import chromadb
@@ -40,12 +40,12 @@ class Db:
 
     return list(self.retrievers.keys())
 
-  def get_active_document(self) -> str | None:
+  def get_active_document(self) -> Union[str, None]:
     """Get the active PDF."""
 
     return self.active
 
-  def get_active_retriever(self) -> BaseRetrievalQA | None:
+  def get_active_retriever(self) -> Union[BaseRetrievalQA, None]:
     """Get the active retriever."""
 
     return None if not self.active else self.retrievers[self.active]
