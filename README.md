@@ -1,6 +1,8 @@
 **pdfathom** is a command-line utility that lets you query PDF documents with
 natural language.
 
+![](https://user-images.githubusercontent.com/31192478/233440529-8b60a6eb-a9bf-487a-9ee0-ff175e87a29d.png)
+
 ### Installation
 
 You can install it via the pip package manager:
@@ -46,7 +48,7 @@ options:
                         Chunk overlap
 ```
 
-A sample run would look like: `pdfathom a.pdf b.pdf https://someurl.com/baz.pdf`
+A sample run would look like `pdfathom a.pdf b.pdf https://someurl.com/baz.pdf`
 (space-separated) to load in respective PDF files into an interactive REPL
 environment (assuming those pdf files exist).
 
