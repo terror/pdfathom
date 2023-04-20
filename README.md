@@ -33,6 +33,23 @@ options:
                         Chunk overlap
 ```
 
+A sample run would look like: `pdfathom a.pdf b.pdf https://someurl.com/baz.pdf`
+(space-separated) to load in respective PDF files into an interactive REPL
+environment (assuming those pdf files exist).
+
+The REPL environment gives you access to a few commands that make it easier to
+load and switch to different files:
+
+```
+- active: Prints the active PDF document.
+- clear: Clears the terminal screen.
+- exit: Exits the application.
+- help: Displays the help text with available commands.
+- list: Lists all loaded PDF documents.
+- load <path or url>: Loads a new PDF document from a specified path or URL.
+- switch <path or url>: Switches to another PDF document from a specified path or URL.
+```
+
 ### Configuration
 
 **pdfathom** looks for a configuration file called `.pdfathom.json` located in
